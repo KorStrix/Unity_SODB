@@ -1,0 +1,42 @@
+# 이 워크플로는 
+# master Branch에서 바로 작업 후 커밋 할 경우 동기화를 위해 workspace의 {githubPageRepo}/{targetFolder}에 커밋을 합니다.
+name: Copy Master To Workspace Branch
+
+on:
+  push:
+     branches:
+       - master
+
+env:
+  githubPageRepo: ID/REPO_NAME
+  targetFolder: Packages/PACKAGENAME/
+    
+    
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+       
+       
+    steps:
+    - name: Checkout # 새로운 job이기 때문에 다시 checkout을 해야 합니다.
+      uses: actions/checkout@v2
+
+
+    # Upload Packages 폴더
+    - name: Upload site artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: Package
+        path: ${{ env.packagePath }}
+
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # You need some setup, see https://github.com/JamesIves/github-pages-deploy-action
+        BRANCH: workspace
+        FOLDER: ${{ env.packagePath }}
+        REPOSITORY_NAME: ${{ env.githubPageRepo }}
+        TARGET_FOLDER: /${{ env.targetFolder }}
+        CLEAN: false
