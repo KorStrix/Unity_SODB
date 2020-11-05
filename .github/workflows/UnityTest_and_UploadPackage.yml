@@ -1,0 +1,91 @@
+# 이 워크플로는 
+# 1. Unity-UnitTest 실행 후 결과에 따라
+# 1-1. 문제가 있으면 Artifact에 버그 리포트 및 중단,
+# 1-2. 문제가 없으면 2로 넘어갑니다.
+# 
+# 2. Packages를 Artifacts에 Upload를 한 뒤 {githubPageRepo}의 mater 분기에 커밋을 합니다.
+name: UnityTest and Upload Package
+
+on:
+  push:
+     branches:
+       - workspace
+
+env:
+  # Require Unity Unit Test
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  packagePath: Packages/PACKAGE_NAME
+    
+  # Deploy to main branch
+  githubPageRepo: ID/REPO_NAME
+    
+    
+    
+jobs:
+  testAllModes:
+    name: Test in ${{ matrix.testMode }} on version ${{ matrix.unityVersion }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion:
+          - 2018.4.22f1
+        testMode:
+          - playmode
+          - editmode
+    
+    
+    steps:
+    - name: Checkout # 일단 이 Repo를 Checkout을 합니다.
+      uses: actions/checkout@v2
+      with:
+        ref: workspace
+    
+    - name: Cached
+      uses: actions/cache@v1.1.0
+      with:
+        path: Library
+        key: Library
+        restore-keys: |
+            Library-
+
+    
+    # Test
+    - name: Run tests
+      id: tests
+      uses: webbertakken/unity-test-runner@v1.4
+      with:
+        # projectPath: ${{ matrix.projectPath }}
+        unityVersion: ${{ matrix.unityVersion }}
+        testMode: ${{ matrix.testMode }}
+        artifactsPath: ${{ matrix.testMode }}-artifacts
+       
+   
+  deploy: # deploy Job을 선언합니다.
+    needs: testAllModes
+    runs-on: ubuntu-latest
+       
+       
+    steps:
+    - name: Checkout # 새로운 job이기 때문에 다시 checkout을 해야 합니다.
+      uses: actions/checkout@v2
+
+
+
+    # Upload Packages 폴더
+    - name: Upload site artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: Package
+        path: ${{ env.packagePath }}
+
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # You need some setup, see https://github.com/JamesIves/github-pages-deploy-action
+        BRANCH: master
+        FOLDER: ${{ env.packagePath }}
+        REPOSITORY_NAME: ${{ env.githubPageRepo }}
+        TARGET_FOLDER: /
+        CLEAN: true
