@@ -8,8 +8,8 @@ on:
        - master
 
 env:
-  githubPageRepo: ID/REPO_NAME
-  targetFolder: Packages/PACKAGENAME/
+  githubPageRepo: Korstrix/korstrix.github.io
+  targetFolder: Packages/Unity_SODB/
     
     
     
