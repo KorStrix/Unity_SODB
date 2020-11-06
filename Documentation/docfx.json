@@ -22,7 +22,7 @@
 			"_appFooter": "Example Footer",
 			
 			"_gitContribute": {
-				"repo": "https://github.com/ID/Repository",
+				"repo": "https://github.com/Korstrix/Unity_SODB",
 				"branch": "workspace",
 				"apiSpecFolder": "Documentation/apiSpec"
 			},

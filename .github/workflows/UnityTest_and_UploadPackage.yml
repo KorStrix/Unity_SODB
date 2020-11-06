@@ -14,10 +14,10 @@ on:
 env:
   # Require Unity Unit Test
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-  packagePath: Packages/PACKAGE_NAME
+  packagePath: Packages/Unity_SODB
     
-  # Deploy to main branch
-  githubPageRepo: ID/REPO_NAME
+  # Deploy to this Github master branch
+  githubPageRepo: Korstrix/Unity_SODB
     
     
     

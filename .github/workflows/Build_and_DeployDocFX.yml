@@ -17,8 +17,8 @@ env:
   unityProjectPath: Documentation
   
   # Require Deploy
-  githubPageRepo: ID/REPO_NAME_DEPLOY
-  targetFolder: project/PACKAGE_NAME
+  githubPageRepo: Korstrix/korstrix.github.io
+  targetFolder: project/Unity_SODB
     
 
 jobs: # 잡들 선언
