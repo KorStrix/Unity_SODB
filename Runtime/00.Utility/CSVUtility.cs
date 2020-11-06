@@ -1,4 +1,4 @@
-﻿#region Header
+#region Header
 /*	============================================
  *	작성자 : Strix
  *	작성일 : 2019-10-18 오전 9:44:28
@@ -369,7 +369,14 @@ namespace Sinbad
                 if (index < values.Length)
                 {
                     string val = values[index];
-                    setAny = SetField(field, val, fi, pi, destObject) || setAny;
+                    try
+                    {
+                        setAny = SetField(field, val, fi, pi, destObject) || setAny;
+                    }
+                    catch (Exception e)
+                    {
+                        OnError?.Invoke($"CsvUtil: error parsing line '{line}': not enough fields\n" + e);
+                    }
                 }
                 else
                 {
@@ -412,7 +419,7 @@ namespace Sinbad
         private static object ParseString(string strValue, Type t)
         {
             var cv = TypeDescriptor.GetConverter(t);
-            return cv.ConvertFromInvariantString(strValue);
+            return cv.ConvertFromString(strValue);
         }
 
         private static IEnumerable<string> EnumerateCsvLine(string line)

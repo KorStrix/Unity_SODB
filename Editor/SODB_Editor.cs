@@ -39,7 +39,7 @@ namespace SODB
 
         /* public - [Do~Something] Function 	        */
 
-        [MenuItem("Tools/Strix/SODB/Editor")]
+        [MenuItem("Tools/Strix/SODB Editor %#e")]
         public static void DoShow()
         {
             SODB_Editor pWindow = (SODB_Editor) GetWindow(typeof(SODB_Editor), false);
@@ -55,8 +55,8 @@ namespace SODB
 
         private void OnGUI()
         {
-            EditorGUILayout.HelpBox("이 툴은 Data Script를 SO(ScriptableObject)로 DB(Database)화 해주는 툴입니다.\n" +
-                                    "작업 순서\n" + 
+            EditorGUILayout.HelpBox("Data Script를 SO(ScriptableObject)로 DB(Database)화 해주는 툴입니다.\n" +
+                                    "\n작업 순서\n" + 
                                     "1. 아무 Data Script를 Table Target에 넣어보세요\n" + 
                                     "2. 적당히 세팅해보고 Generate 버튼을 눌러봅니다.\n",
                                     MessageType.Info);
@@ -80,11 +80,18 @@ namespace SODB
             if (_pScriptTarget == null)
                 return;
 
-            _pSetting.DoDrawTable(_pScriptTarget, out TableConfig pTableConfig);
+            _pSetting.DoDrawTable(_pScriptTarget, 140f, out TableConfig pTableConfig);
 
+            //if (GUILayout.Button("Edit Indexes"))
+            //{
+            //    Debug.Log("Edit Indexes!");
+            //    SODB_TableIndex_Editor.DoShow(pTableConfig);
+            //}
+
+            EditorGUILayout.Space();
             if (GUILayout.Button("Generate Table Code!", GUILayout.Height(30)))
             {
-                SOTableGenerator.DoGenerate_CSFile(pTableConfig, GetAbsolutePath(_pScriptTarget));
+                TableGenerator.DoGenerate_CSFile(_pScriptTarget, pTableConfig, GetAbsolutePath(_pScriptTarget));
                 Debug.Log("Generate Table Code!");
             }
         }
@@ -101,7 +108,7 @@ namespace SODB
 
         public static string GetAbsolutePath(MonoScript pScript)
         {
-            return $"{Application.dataPath}/{AssetDatabase.GetAssetPath(pScript)}";
+            return $"{Application.dataPath}/{AssetDatabase.GetAssetPath(pScript).Replace(".cs", "")}";
         }
 
         #endregion Private

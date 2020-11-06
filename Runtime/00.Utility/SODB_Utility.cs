@@ -59,5 +59,24 @@ namespace SODB
 
             return arrRemoveList.Length;
         }
+
+
+        public static bool ContainEnumFlag<TEnum>(this TEnum eEnumFlag, params TEnum[] arrEnum)
+            where TEnum : struct, System.IConvertible, System.IComparable, System.IFormattable
+        {
+            bool bIsContain = false;
+
+            int iEnumFlag = eEnumFlag.GetHashCode();
+            foreach (var pEnum in arrEnum)
+            {
+                int iEnum = pEnum.GetHashCode();
+                bIsContain = (iEnumFlag & iEnum) != 0;
+                if (bIsContain)
+                    break;
+            }
+
+            return bIsContain;
+        }
+
     }
 }

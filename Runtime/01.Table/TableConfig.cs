@@ -20,26 +20,21 @@ namespace SODB
         None = 0,
 
         /// <summary>
-        /// Not Null
-        /// </summary>
-        NN = 1 << 1,
-
-        /// <summary>
-        /// Not Overlap
-        /// </summary>
-        NO = 1 << 2,
-
-        /// <summary>
-        /// Unique Key
-        /// <para>Rows 중 유일한 키(=중복허용X), <see langword="null"/>이 허용됩니다.</para>
-        /// </summary>
-        UQ = 1 << 3,
-
-        /// <summary>
         /// Primary Key
         /// <para>Rows 중 유일한 키(=중복허용X), <see langword="null"/>이 허용되지 않습니다.</para>
         /// </summary>
-        PK = 1 << 4,
+        PK = 1 << 0,
+
+        ///// <summary>
+        ///// Not Null
+        ///// </summary>
+        //NN = 1 << 1,
+
+        ///// <summary>
+        ///// Unique Key
+        ///// <para>Rows 중 유일한 키(=중복허용X), <see langword="null"/>이 허용됩니다.</para>
+        ///// </summary>
+        //UQ = 1 << 2,
     }
 
     enum ELabelName

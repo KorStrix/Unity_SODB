@@ -84,15 +84,16 @@ namespace SODB
         public string strLastEditScript_GUID { get; private set; }
 
 
-        public void DoDrawTable(MonoScript pScript, out TableConfig pTableConfig)
+        public void DoDrawTable(MonoScript pScript, float fScrollHeight, out TableConfig pTableConfig)
         {
             Record_LastScriptGUID(pScript);
+            EditorGUILayout.LabelField("Columns");
             DrawHeader();
 
             Type pType = pScript.GetClass();
             pTableConfig = GetOrNew_TableConfig(pType);
 
-            DrawFields(pTableConfig, pType.GetFields(BindingFlags.Public | BindingFlags.Instance));
+            DrawFields(pTableConfig, pType.GetFields(BindingFlags.Public | BindingFlags.Instance), fScrollHeight);
             CleanUpTable(pTableConfig);
         }
 
@@ -116,10 +117,12 @@ namespace SODB
 
 
         Vector2 _vecScroll_ForFields;
-        private void DrawFields(TableConfig pTableConfig, FieldInfo[] arrMember)
+        private void DrawFields(TableConfig pTableConfig, FieldInfo[] arrMember, float fScrollHeight)
         {
             EditorGUILayout.BeginScrollView(_vecScroll_ForFields, 
-                GUILayout.ExpandHeight(true), GUILayout.MinHeight(50f));
+                GUILayout.ExpandHeight(true), GUILayout.MinHeight(fScrollHeight));
+
+            ColumnConfig pPKColumn = pTableConfig.listColumnConfig.FirstOrDefault(p => p.eTypeFlags == EColumnTypeFlags.PK);
 
             for (int i = 0; i < arrMember.Length; i++)
             {
@@ -127,8 +130,8 @@ namespace SODB
                 var pColumnConfig = GetOrNew_ColumnConfig(pTableConfig, pFieldInfo);
 
                 bool bIsPK = (pColumnConfig.eTypeFlags & EColumnTypeFlags.PK) != 0;
-                bool bIsNN = (pColumnConfig.eTypeFlags & EColumnTypeFlags.NN) != 0;
-                bool bIsUQ = (pColumnConfig.eTypeFlags & EColumnTypeFlags.UQ) != 0;
+                // bool bIsNN = (pColumnConfig.eTypeFlags & EColumnTypeFlags.NN) != 0;
+                // bool bIsUQ = (pColumnConfig.eTypeFlags & EColumnTypeFlags.UQ) != 0;
 
                 EditorGUILayout.BeginHorizontal();
                 {
@@ -136,15 +139,28 @@ namespace SODB
                     EditorGUILayout.LabelField(pFieldInfo.Name, GUILayout.MaxWidth(const_LabelSize[ELabelName.Column]));
 
                     EColumnTypeFlags eColumnTypeFlags = EColumnTypeFlags.None;
-                    if (EditorGUILayout.Toggle(bIsPK, GUILayout.MaxWidth(const_LabelSize[ELabelName.PK])))
-                        eColumnTypeFlags |= EColumnTypeFlags.PK;
+
+                    bool bIgnoreSet_PK = pPKColumn != null && pPKColumn.strColumnName != pColumnConfig.strColumnName;
+                    GUI.enabled = bIgnoreSet_PK == false;
+                    {
+                        if (EditorGUILayout.Toggle(bIsPK, GUILayout.MaxWidth(const_LabelSize[ELabelName.PK])))
+                        {
+                            if (bIgnoreSet_PK)
+                            {
+                                EditorUtility.DisplayDialog("Error", "this table already has PK", "ok");
+                                continue;
+                            }
+                            eColumnTypeFlags |= EColumnTypeFlags.PK;
+                        }
+                    }
+                    GUI.enabled = true;
 
                     // PK는 반드시 NN을 포함해야 합니다.
-                    if (EditorGUILayout.Toggle(bIsPK || bIsNN, GUILayout.MaxWidth(const_LabelSize[ELabelName.NN])))
-                        eColumnTypeFlags |= EColumnTypeFlags.NN;
+                    //if (EditorGUILayout.Toggle(bIsPK || bIsNN, GUILayout.MaxWidth(const_LabelSize[ELabelName.NN])))
+                    //    eColumnTypeFlags |= EColumnTypeFlags.NN;
 
-                    if (EditorGUILayout.Toggle(bIsUQ, GUILayout.MaxWidth(const_LabelSize[ELabelName.UQ])))
-                        eColumnTypeFlags |= EColumnTypeFlags.UQ;
+                    //if (EditorGUILayout.Toggle(bIsUQ, GUILayout.MaxWidth(const_LabelSize[ELabelName.UQ])))
+                    //    eColumnTypeFlags |= EColumnTypeFlags.UQ;
 
                     pColumnConfig.eTypeFlags = eColumnTypeFlags;
                 }
